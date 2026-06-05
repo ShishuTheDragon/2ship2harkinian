@@ -616,8 +616,7 @@ void PadMgr_HandleRetrace(void) {
     // osRecvMesg(serialEventQueue, NULL, OS_MESG_BLOCK);
     osContGetReadData(sPadMgrInstance->pads);
 
-    // Clear all but controller 1
-    memset(&sPadMgrInstance->pads[1], 0, sizeof(*sPadMgrInstance->pads) * (MAXCONTROLLERS - 1));
+    // 2S2H: Allow all controller ports to pass through so Player 2 can be read from input[1]
 
     // If in PreNMI, clear all controllers
     if (sPadMgrInstance->isResetting) {
