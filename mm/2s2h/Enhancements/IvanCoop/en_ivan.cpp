@@ -132,31 +132,15 @@ void EnIvan_Update(Actor* thisx, PlayState* play) {
     EnIvan* self = (EnIvan*)thisx;
     Input* input = &play->state.input[thisx->params]; // params=1 → controller 2
 
-    // Camera-relative movement from analog stick
-    f32 relX = input->cur.stick_x / 10.0f;
-    f32 relY = input->cur.stick_y / 10.0f;
+    f32 stickX = input->cur.stick_x;
+    f32 stickY = input->cur.stick_y;
+    f32 desiredSpeed = sqrtf(stickX * stickX + stickY * stickY) / 10.0f;
 
-    Camera* cam = GET_ACTIVE_CAM(play);
-    Vec3f camForward = {
-        cam->at.x - cam->eye.x,
-        0.0f,
-        cam->at.z - cam->eye.z,
-    };
-    f32 camLen = sqrtf(camForward.x * camForward.x + camForward.z * camForward.z);
-    if (camLen > 0.001f) {
-        camForward.x /= camLen;
-        camForward.z /= camLen;
-    }
-    Vec3f camRight = { -camForward.z, 0.0f, camForward.x };
-
-    f32 velX = camRight.x * relX + camForward.x * relY;
-    f32 velZ = camRight.z * relX + camForward.z * relY;
-    f32 desiredSpeed = sqrtf(velX * velX + velZ * velZ);
-
-    // Rotate to face movement direction
+    // Rotate to face movement direction, camera-relative (matches player actor convention)
     if (desiredSpeed > 0.01f) {
-        s16 targetRot = Math_Atan2S(-velX, velZ);
-        Math_SmoothStepToS(&thisx->world.rot.y, targetRot, 2, 10000, 0);
+        s16 stickAngle = Math_Atan2S_XY(stickY, -stickX);
+        s16 worldYaw = Camera_GetInputDirYaw(GET_ACTIVE_CAM(play)) + stickAngle;
+        Math_SmoothStepToS(&thisx->world.rot.y, worldYaw, 2, 10000, 0);
         thisx->shape.rot.y = thisx->world.rot.y;
     }
 
