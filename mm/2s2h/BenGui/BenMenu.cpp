@@ -1056,6 +1056,7 @@ void BenMenu::AddEnhancements() {
     AddWidget(path, "Time Moves when you Move", WIDGET_CVAR_CHECKBOX)
         .CVar("gModes.TimeMovesWhenYouMove")
         .Options(CheckboxOptions().Tooltip("Time only moves when Link is not standing still."));
+    AddIvanSettings(path);
     AddWidget(path, "Mirrored World", WIDGET_CVAR_CHECKBOX)
         .CVar("gModes.MirroredWorld.Mode")
         .Callback([](WidgetInfo& info) {

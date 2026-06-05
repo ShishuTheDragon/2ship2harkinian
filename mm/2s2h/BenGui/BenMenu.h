@@ -23,6 +23,7 @@ class BenMenu : public Ship::Menu {
     void AddSettings();
     void AddEnhancements();
     void AddDevTools();
+    void AddIvanSettings(WidgetPath& path);
 };
 } // namespace BenGui
 
