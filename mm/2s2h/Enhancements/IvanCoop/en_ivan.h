@@ -20,6 +20,7 @@ typedef struct EnIvan {
     /* 0x26C */ LightNode* lightNodeNoGlow;
     /* 0x270 */ f32 yVelocity;
     /* 0x274 */ u8 shouldDraw;
+    /* 0x276 */ s16 shotTimer;
 } EnIvan;
 
 void EnIvan_Init(Actor* thisx, PlayState* play);

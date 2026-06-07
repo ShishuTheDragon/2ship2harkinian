@@ -1,6 +1,7 @@
 #include "en_ivan.h"
 #include "2s2h/Enhancements/FrameInterpolation/FrameInterpolation.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
+#include "overlays/actors/ovl_En_Arrow/z_en_arrow.h"
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_DRAW_CULLING_DISABLED)
 
@@ -44,6 +45,23 @@ static ColliderCylinderInit sCylinderInit = {
     },
     { 12, 27, 0, { 0, 0, 0 } },
 };
+
+static void EnIvan_ShootArrow(EnIvan* self, PlayState* play) {
+    if (self->shotTimer > 0 || AMMO(ITEM_BOW) <= 0) {
+        return;
+    }
+
+    Actor* arrow = Actor_SpawnAsChild(&play->actorCtx, &self->actor, play, ACTOR_EN_ARROW,
+                                      self->actor.world.pos.x, self->actor.world.pos.y + 7.0f,
+                                      self->actor.world.pos.z, 0, self->actor.world.rot.y, 0, ARROW_TYPE_NORMAL);
+    if (arrow != NULL) {
+        GET_PLAYER(play)->unk_D57 = 4;
+        arrow->parent = NULL;
+        Inventory_ChangeAmmo(ITEM_BOW, -1);
+        self->shotTimer = 10;
+        Actor_PlaySfx(&self->actor, NA_SE_PL_BOW_DRAW);
+    }
+}
 
 static Vec3f sSparkleVelocity = { 0.0f, -0.05f, 0.0f };
 static Vec3f sSparkleAccel = { 0.0f, -0.025f, 0.0f };
@@ -114,6 +132,7 @@ void EnIvan_Init(Actor* thisx, PlayState* play) {
 
     self->yVelocity = 0.0f;
     self->shouldDraw = true;
+    self->shotTimer = 0;
 
     thisx->room = -1; // persist through room transitions
     thisx->terminalVelocity = -20.0f;
@@ -161,6 +180,14 @@ void EnIvan_Update(Actor* thisx, PlayState* play) {
 
     Actor_MoveWithGravity(thisx);
     Actor_UpdateBgCheckInfo(play, thisx, 19.0f, 20.0f, 0.0f, 5);
+
+    if (self->shotTimer > 0) {
+        self->shotTimer--;
+    }
+
+    if (CHECK_BTN_ALL(input->press.button, BTN_R)) {
+        EnIvan_ShootArrow(self, play);
+    }
 
     // Z-trigger: snap back to Link
     if (CHECK_BTN_ALL(input->cur.button, BTN_Z)) {
