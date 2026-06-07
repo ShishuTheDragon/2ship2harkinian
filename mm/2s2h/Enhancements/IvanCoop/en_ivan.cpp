@@ -93,7 +93,7 @@ void EnIvan_Init(Actor* thisx, PlayState* play) {
 
     SkelAnime_Init(play, &self->skelAnime, (SkeletonHeader*)gameplay_keep_Skel_02AF58,
                    (AnimationHeader*)gameplay_keep_Anim_029140, self->jointTable, self->morphTable, FAIRY_LIMB_MAX);
-    ActorShape_Init(&thisx->shape, 0.0f, NULL, 15.0f);
+    ActorShape_Init(&thisx->shape, 1125.0f, NULL, 15.0f);
 
     Lights_PointGlowSetInfo(&self->lightInfoGlow, thisx->world.pos.x, thisx->world.pos.y, thisx->world.pos.z, 200, 255,
                             200, 0);
