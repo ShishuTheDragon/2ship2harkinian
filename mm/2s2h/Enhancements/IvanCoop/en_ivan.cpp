@@ -183,6 +183,22 @@ void EnIvan_Update(Actor* thisx, PlayState* play) {
     EnIvan_UpdateLights(self, play);
 }
 
+static s32 EnIvan_OverrideLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot, Actor* thisx,
+                                    Gfx** gfx) {
+    static Vec3f sZeroVec = { 0.0f, 0.0f, 0.0f };
+
+    if (limbIndex == FAIRY_LIMB_6) {
+        f32 scale = ((Math_SinS((s16)play->gameplayFrames * 4096) * 0.1f) + 1.0f) * 0.012f;
+        scale *= thisx->scale.x * (1.0f / 0.008f);
+
+        Vec3f worldPos;
+        Matrix_MultVec3f(&sZeroVec, &worldPos);
+        Matrix_Translate(worldPos.x, worldPos.y, worldPos.z, MTXMODE_NEW);
+        Matrix_Scale(scale, scale, scale, MTXMODE_APPLY);
+    }
+    return false;
+}
+
 void EnIvan_Draw(Actor* thisx, PlayState* play) {
     EnIvan* self = (EnIvan*)thisx;
 
@@ -209,8 +225,8 @@ void EnIvan_Draw(Actor* thisx, PlayState* play) {
     gDPSetEnvColor(POLY_XLU_DISP++, (u8)self->outerColor.r, (u8)self->outerColor.g, (u8)self->outerColor.b,
                    (u8)envAlpha);
 
-    POLY_XLU_DISP = SkelAnime_Draw(play, self->skelAnime.skeleton, self->skelAnime.jointTable, NULL, NULL, thisx,
-                                   POLY_XLU_DISP);
+    POLY_XLU_DISP = SkelAnime_Draw(play, self->skelAnime.skeleton, self->skelAnime.jointTable,
+                                   EnIvan_OverrideLimbDraw, NULL, thisx, POLY_XLU_DISP);
 
     CLOSE_DISPS(play->state.gfxCtx);
 }
